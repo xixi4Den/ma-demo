@@ -1,0 +1,64 @@
+services:
+  slot:
+    container_name: slot
+    image: slot
+    build:
+      context: ../MA.SlotService
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Logging__LogLevel__MA=Debug
+      - Redis__ConnectionString=redis-slot
+      - Rabbit__Host=rabbitmq
+      - Rabbit__Username=guest
+      - Rabbit__Password=guest
+    ports:
+      - 8081:80
+    depends_on:
+      redis-slot:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+
+  redis-slot:
+    container_name: redis-slot
+    image: redis/redis-stack-server:latest
+
+  reward:
+    container_name: reward
+    image: reward
+    build:
+      context: ../MA.RewardService
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Logging__LogLevel__MA=Debug
+      - Redis__ConnectionString=redis-slot
+      - Rabbit__Host=rabbitmq
+      - Rabbit__Username=guest
+      - Rabbit__Password=guest
+      - Missions__FilePath=/opt/reward/config/missions-config.json
+    ports:
+      - 8082:80
+    volumes:
+      - type: bind
+        source: ./config
+        target: /opt/reward/config
+    depends_on:
+      redis-reward:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+
+  redis-reward:
+    container_name: redis-reward
+    image: redis/redis-stack-server:latest
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: masstransit/rabbitmq:latest
+    ports:
+      - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 10s
+      retries: 3
