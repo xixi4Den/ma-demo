@@ -1,9 +1,7 @@
 services:
   slot:
     container_name: slot
-    image: slot
-    build:
-      context: ../MA.SlotService
+    image: xixi4den/ma.slot-service
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - Logging__LogLevel__MA=Debug
@@ -28,9 +26,7 @@ services:
 
   reward:
     container_name: reward
-    image: reward
-    build:
-      context: ../MA.RewardService
+    image: xixi4den/ma.reward-service
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - Logging__LogLevel__MA=Debug

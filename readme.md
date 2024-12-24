@@ -23,7 +23,7 @@ Before running the project, make sure you have the following installed:
 ---
 
 ## Run with local build
-Follow these steps to run the services locally with Docker Compose:
+Follow these steps to build images locally and run the services:
 1. Clone [Demo](https://github.com/xixi4Den/ma-demo) repository
 2. Clone [Slot service](https://github.com/xixi4Den/MA.SlotService) repository
 3. Clone [Reward service](https://github.com/xixi4Den/MA.RewardService) repository
@@ -41,7 +41,7 @@ Follow these steps to run the services locally with Docker Compose:
 └───MA.RewardService
 ```
 5. Modify `/ma-demo/config/missions-config.json` file (if requred)
-6. Run `docker-compose up` to build and start the services and their dependencies
+6. Run `docker-compose up --build` to build and start the services and their dependencies
 7. Access services
   - Slot service
     - [Swagger UI](http://localhost:8081/swagger)
@@ -53,12 +53,27 @@ Follow these steps to run the services locally with Docker Compose:
     - [management interface](http://localhost:15672) (login: `guest`, password: `guest`)
 - [Zipkin](http://localhost:9411)
 - [Prometheus](http://localhost:9090)
-6. Run `docker-compose down` to remove services and their dependencies
+8. Run `docker-compose down` to remove services and their dependencies
 
 
-## Run with built images
+## Run with images from DockerHub
 
-TODO
+Follow these steps to run the services from images published to DockerHub:
+1. Clone [Demo](https://github.com/xixi4Den/ma-demo) repository
+2. Modify `/ma-demo/config/missions-config.json` file (if requred)
+3. Run `docker-compose -f docker-compose.images.yml up` to start the services and their dependencies
+4. Access services
+  - Slot service
+    - [Swagger UI](http://localhost:8081/swagger)
+    - [Healh check](http://localhost:8081/health)
+  - Reward service
+    - [Swagger UI](http://localhost:8082/swagger)
+    - [Healh check](http://localhost:8082/health)
+  - RabbitMQ:
+    - [management interface](http://localhost:15672) (login: `guest`, password: `guest`)
+- [Zipkin](http://localhost:9411)
+- [Prometheus](http://localhost:9090)
+5. Run `docker-compose -f docker-compose.images.yml down` to remove services and their dependencies
 
 ## Configuration
 
