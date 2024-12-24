@@ -41,7 +41,7 @@ Follow these steps to build images locally and run the services:
 └───MA.RewardService
 ```
 5. Modify `/ma-demo/config/missions-config.json` file (if requred)
-6. Run `docker-compose up --build` to build and start the services and their dependencies
+6. Run `docker-compose up --build` to build images and start the services with their dependencies
 7. Access services
   - Slot service
     - [Swagger UI](http://localhost:8081/swagger)
@@ -120,3 +120,22 @@ Here is default configuration in `/config/misions-config.json` file
 	"repeatedIndex": 1
 }
 ```
+
+## Technical considerations
+
+![Sequence diagram](/images/diagram1.png)
+
+1. Services communicate asynchronously using RabbitMQ as a message broker, with the MassTransit library as an abstraction layer
+2. RabbitMQ provides _at least once_ delivery guarantee. To meet the system's requirement for _exactly once_ delivery, I implemented a primitive deduplication mechanism at application layer
+3. The Reward service uses Redis transactions as optimistic locks to ensure consistent mission progress updates. In scenarios where the service is scaled out, a race condition may occur. To mitigate this, the following strategies could be considered:
+	- add retries if the conflict rate is low.
+	- using RabbitMQ’s [Single Active Consumer](https://www.rabbitmq.com/docs/consumers#single-active-consumer) feature to ensure a single consumer processes messages per queue, though this limits scalability.
+	- change optimistic lock to pessimistic lock for high conflict rates, which may impact throughput.
+4. _CoinsRewardGrantedEvent_ is published by the Reward service but remains unconsumed in the current scope. In my view, the Coins entity logically belongs to a dedicated service, such as a Wallet service, responsible for managing virtual goods. Additional requirements would help refine this decision.
+5. Given the asynchronous nature of communication, slot balance and coin balance are updated asynchronously, which may present challenges for the frontend. While frontend design was out of scope, potential solutions include:
+	- polling or long polling
+	- WebSocket (I’ve included a diagram illustrating a potential architecture) ![Web socker diagram](/images//diagram2.jpg)
+6. Authentication was out of scope for this assignment. _UserId_ is passed as a plain integer in HTTP header.
+7. Both services are covered by unit and integration tests. Integration tests run with Redis, managed by TestContainers.
+8. Both services expose OpenTelemetry traces and metrics to ensure the system’s observability—a critical aspect of distributed systems.
+
