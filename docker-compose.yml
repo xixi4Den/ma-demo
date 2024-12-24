@@ -11,6 +11,7 @@ services:
       - Rabbit__Host=rabbitmq
       - Rabbit__Username=guest
       - Rabbit__Password=guest
+      - EXPORTER_OTLP_ENDPOINT=http://zipkin:9411/api/v2/spans
     ports:
       - 8081:80
     depends_on:
@@ -18,6 +19,8 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+      zipkin:
+        condition: service_started
 
   redis-slot:
     container_name: redis-slot
@@ -36,6 +39,7 @@ services:
       - Rabbit__Username=guest
       - Rabbit__Password=guest
       - Missions__FilePath=/opt/reward/config/missions-config.json
+      - EXPORTER_OTLP_ENDPOINT=http://zipkin:9411/api/v2/spans
     ports:
       - 8082:80
     volumes:
@@ -47,6 +51,8 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+      zipkin:
+        condition: service_started
 
   redis-reward:
     container_name: redis-reward
@@ -62,3 +68,16 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - 9411:9411
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"

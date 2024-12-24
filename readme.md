@@ -8,6 +8,8 @@ This project demonstrates a Slot Machine system with two microservices:
 The services rely on:
  - **Redis** as data storage (each service has dedicated Redis instance)
  - **RabbitMQ** as message broker
+ - **Zipkin** as distributed tracing system
+ - **Prometheus** as monitoring system
 
 ---
 
@@ -42,13 +44,15 @@ Follow these steps to run the services locally with Docker Compose:
 6. Run `docker-compose up` to build and start the services and their dependencies
 7. Access services
   - Slot service
-    - Swagger UI - http://localhost:8081/swagger
-    - Healh check - http://localhost:8081/health
+    - [Swagger UI](http://localhost:8081/swagger)
+    - [Healh check](http://localhost:8081/health)
   - Reward service
-    - Swagger UI - http://localhost:8082/swagger
-    - Healh check - http://localhost:8082/health
+    - [Swagger UI](http://localhost:8082/swagger)
+    - [Healh check](http://localhost:8082/health)
   - RabbitMQ:
-    - management interface - http://localhost:15672/ (default login: `guest`, password: `guest`)
+    - [management interface](http://localhost:15672) (login: `guest`, password: `guest`)
+- [Zipkin](http://localhost:9411)
+- [Prometheus](http://localhost:9090)
 6. Run `docker-compose down` to remove services and their dependencies
 
 
